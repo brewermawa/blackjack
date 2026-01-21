@@ -21,3 +21,74 @@ This class is not meant to be used to create instances, it will only contain cla
 
 ### Comments
 - All of the methods should check if the hand received is an instance of the hand class and raise a ValueError if it is not.
+
+
+# BlackJackStrategy
+
+The purpose of the BlackJackStrategy class is very simple: it receives the player hand and the dealers up card and returns the correct action (stand, hit, double, split, surrender).
+
+It does nothing else: does not manipulate hands, calculate payouts, make a decision, etc.
+
+It is meant to be used by other code, for example the blackjack simulator
+
+No instances of BlackJackStrategy can be created (no __init__ method). The class will only expose class methods.
+
+For v1.0 only one set of rules will be used:
+- Dealer hits on soft 17
+- Surrender
+- Doble after split allowed
+- Double with any two cards
+
+The action returned is of type Action that is an Enum declared inside BlackJackStrategy:
+class Action(Enum):
+    HIT = "hit"
+    STAND = "stand"
+    DOUBLE = "double"
+    SPLIT = "split"
+    SURRENDER = "surrender"
+
+## Methods (decorated with @classmethod)
+strategy(player_hand: Hand, dealer_card: Card) -> BlackJackStrategy.Action:
+The strategy method receives the player hand and the dealer up card and returns a value of the Action Enum defined inside the BlackJackStrategy class.
+
+The strategy is based on the following table:
+         2  3  4  5  6  7  8  9  10 A
+5–8      H  H  H  H  H  H  H  H  H  H
+9        H  D  D  D  D  H  H  H  H  H
+10       D  D  D  D  D  D  D  D  H  H
+11       D  D  D  D  D  D  D  D  D  H
+12       H  H  S  S  S  H  H  H  H  H
+13–14    S  S  S  S  S  H  H  H  H  H
+15       S  S  S  S  S  H  H  H  R  H
+16       S  S  S  S  S  H  H  R  R  R
+17+      S  S  S  S  S  S  S  S  S  S
+
+          2  3  4  5  6  7  8  9  10 A
+A,2 (13)  H  H  H  D  D  H  H  H  H  H
+A,3 (14)  H  H  H  D  D  H  H  H  H  H
+A,4 (15)  H  H  D  D  D  H  H  H  H  H
+A,5 (16)  H  H  D  D  D  H  H  H  H  H
+A,6 (17)  H  D  D  D  D  H  H  H  H  H
+A,7 (18)  S  D  D  D  D  S  S  H  H  H
+A,8 (19)  S  S  S  S  D  S  S  S  S  S
+A,9 (20)  S  S  S  S  S  S  S  S  S  S
+
+         2  3  4  5  6  7  8  9  10 A
+A,A      P  P  P  P  P  P  P  P  P  P
+10,10    S  S  S  S  S  S  S  S  S  S
+9,9      P  P  P  P  P  S  P  P  S  S
+8,8      P  P  P  P  P  P  P  P  P  P
+7,7      P  P  P  P  P  P  H  H  H  H
+6,6      P  P  P  P  P  H  H  H  H  H
+5,5      D  D  D  D  D  D  D  D  H  H
+4,4      H  H  H  P  P  H  H  H  H  H
+3,3      P  P  P  P  P  P  H  H  H  H
+2,2      P  P  P  P  P  P  H  H  H  H
+
+H = Hit
+S = Stand
+D = Double
+P = Split
+R = Surrender
+
+Decision priority follows standard blackjack rules: pairs first, then soft totals, then hard totals.

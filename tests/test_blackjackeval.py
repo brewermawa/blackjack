@@ -154,6 +154,37 @@ class TestBlackjackEval:
     hand_bust_AA46J.add_card(Card("6", "♥"))
     hand_bust_AA46J.add_card(Card("J", "♥"))
 
+    # soft
+    hand_A62 = Hand()
+    hand_A62.add_card(Card("A","♣"))
+    hand_A62.add_card(Card("6","♦"))
+    hand_A62.add_card(Card("2","♦"))
+
+    # soft
+    hand_A222 = Hand()
+    hand_A222.add_card(Card("A","♣"))
+    hand_A222.add_card(Card("2","♦"))
+    hand_A222.add_card(Card("2","♣"))
+    hand_A222.add_card(Card("2","♥"))
+
+    # not soft
+    hand_A67 = Hand()
+    hand_A67.add_card(Card("A","♣"))
+    hand_A67.add_card(Card("6","♦"))
+    hand_A67.add_card(Card("7","♣"))
+
+    # not soft
+    hand_A59 = Hand()
+    hand_A59.add_card(Card("A","♣"))
+    hand_A59.add_card(Card("5","♦"))
+    hand_A59.add_card(Card("9","♣"))
+
+    # not soft
+    hand_A6T = Hand()
+    hand_A6T.add_card(Card("A","♣"))
+    hand_A6T.add_card(Card("6","♦"))
+    hand_A6T.add_card(Card("J","♣"))
+
     @pytest.mark.parametrize(
         "hand",
         [hand_zero_cards, hand_one_card, hand_three_cards]
@@ -241,14 +272,14 @@ class TestBlackjackEval:
 
     @pytest.mark.parametrize(
         "hand_is_soft",
-        [hand_a2, hand_a10, hand_a82, hand_aa8, hand_aaa6]
+        [hand_a2, hand_a10, hand_a82, hand_aa8, hand_aaa6, hand_A222]
     )
     def test_soft_returns_true_if_the_hand_is_soft(self, hand_is_soft):
         assert BlackJackEval.soft(hand_is_soft) is True
 
     @pytest.mark.parametrize(
         "hand_not_soft",
-        [hand_62, hand_66, hand_kj]
+        [hand_62, hand_66, hand_kj, hand_A67, hand_A59, hand_A6T]
     )
     def test_soft_returns_false_if_the_hand_is_not_soft(self, hand_not_soft):
         assert BlackJackEval.soft(hand_not_soft) is False

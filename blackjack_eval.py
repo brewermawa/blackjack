@@ -84,10 +84,20 @@ class BlackJackEval:
         
         ace_in_hand = any(card.rank == "A" for card in hand.cards)
 
-        if ace_in_hand and cls.value(hand) <= 21:
-            return True
+        # If no A's in hand, hand is not soft
+        if not ace_in_hand:
+            return False
+
+        # If there is an A
+        # Treat one Ace as 11 (adding 10 to the sum of ranks)
+        # If the sum of the ranks is over 21 hand is not soft
+        # If the sum of the ranks is less than or equal to 21, hand is soft
+
+        ranks_JQK_as_10 = ["10" if card.rank in ["J", "Q", "K"] else card.rank for card in hand.cards]
+        ranks_sum = sum([1 if rank == "A" else int(rank) for rank in ranks_JQK_as_10])
         
-        return False
+        return ranks_sum + 10 <= 21
+        
 
     @classmethod
     def value(cls, hand: Hand) -> int:

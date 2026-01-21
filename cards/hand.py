@@ -8,8 +8,8 @@ class Hand:
         if not isinstance(card, Card):
             raise TypeError("card must be an instance of Card")
         
-        if card in self.cards:
-            raise ValueError(f"card {card} already in hand. Cannot add duplicate")
+        #if card in self.cards:
+        #    raise ValueError(f"card {card} already in hand. Cannot add duplicate")
 
         self.cards.append(card)
 
