@@ -151,9 +151,10 @@ Represents a single complete round of Blackjack, from the initial deal until a t
 
 - hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises ValueError if hits_soft_17 is not bool.
 
-## Atrubutes
+## Attributes
 - player_hand: an instance of Hand class. Contains the player cards. When the BlackJackRound class is initialized, player_hand is created but no cards are added
 - dealer_hand: an instance of Hand class. Contains the dealer cards. When the BlackJackRound class is initialized, dealer_hand is created but no cards are added
+- `player_doubled`: a flag that indicates whether the player executed a `DOUBLE` action in this round (per `BlackJackStrategy`).
 
 
 ## Methods
@@ -269,7 +270,6 @@ SURRENDER
 - Surrender already resolved
 - Split is not supported
 
----
 
 ### Valid actions in this phase
 
@@ -279,7 +279,6 @@ SURRENDER
 
 If the strategy returns `SPLIT` or `SURRENDER` here, it is considered an error.
 
----
 
 ## Player Turn Contract
 
@@ -301,7 +300,6 @@ If the strategy returns `SPLIT` or `SURRENDER` here, it is considered an error.
 - STAND
 - BUST
 
----
 
 ## Player Turn Pseudocode
 
@@ -320,6 +318,7 @@ while True:
             continue
 
     elif action == DOUBLE:
+        set player_doubled to True
         draw 1 card from deck
         add card to player_hand
         break
@@ -331,6 +330,108 @@ while True:
         error (invalid action for player_turn)
 ```
 
----
+## Dealer Turn
+
+Dealer turn only executes if player_hand is not bust
+
+### Preconditions
+
+- Blackjack already resolved
+- Surrender already resolved
+- Player turn already resolved
+- Split is not supported
+
+## Dealer Turn Contract
+
+### Inputs
+- `dealer_hand`
+- `deck`
+- `BlackJackEval`
+- `hits_soft_17`
+
+
+### Side Effects
+- Draws cards from the deck
+- Modifies `dealer_hand`
+
+### Output
+- Returns nothing
+- Leaves dealer_hand in a terminal state
+
+### Terminal states
+- STAND
+- BUST
+
+## Dealer turn algorithm
+
+```text
+1. Dealer turn
+    1. while (
+            dealer hand value < 17
+            or (dealer hand is soft 17 and hits_soft_17 is True)
+        )
+        1. draw one card and add it to dealer hand
+        2. If bust, exit loop
+        3. If not bust, continue loop
+ ```
+
+
+## Compare hands
+
+After the player and dealer hands are in a terminal state, compares boths and returns a result
+
+### Preconditions
+
+- Blackjack already resolved
+- Surrender already resolved
+- Player turn already resolved
+- Dealer turn already resolved
+
+## Compare hands Contract
+
+
+### Inputs
+- `player_hand`
+- `dealer_hand`
+- `BlackJackEval`
+
+
+### Side Effects
+. No side effects
+
+### Output
+- Returns list[RoundOutcome]
+
+
+## Compare hands algorithm
+
+```text
+1. If player_hand is bust:
+       if player_doubled:
+           return [DOUBLE_LOSS]
+       else:
+           return [LOSS]
+
+2. If dealer_hand is bust:
+       if player_doubled:
+           return [DOUBLE_WIN]
+       else:
+           return [WIN]
+
+3. If value(player_hand) == value(dealer_hand):
+       return [PUSH]
+
+4. If value(player_hand) > value(dealer_hand):
+       if player_doubled:
+           return [DOUBLE_WIN]
+       else:
+           return [WIN]
+
+5. Else:
+       if player_doubled:
+           return [DOUBLE_LOSS]
+       else:
+           return [LOSS]
+
 ```
 

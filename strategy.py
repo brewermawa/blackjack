@@ -133,13 +133,8 @@ class BlackJackStrategy:
         
         #Softs
         if BlackJackEval.soft(player_hand):
-            print("---", BlackJackEval.soft(player_hand))
             value = BlackJackEval.value(player_hand)
-            print(value)
             correct_move = cls.SOFT_STRATEGY[value][dealer_card.rank]
-            print(correct_move)
-
-            print(player_hand, "-", dealer_card)
 
             return correct_move
         
