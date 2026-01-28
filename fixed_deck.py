@@ -67,3 +67,9 @@ class FixedDeck(Deck):
 
     def deck_for_split_then_double(self):
         self._program_ranks_top(["6", "5", "6", "10", "5", "K", "4", "K", "Q"])
+
+    def deck_for_double_push(self):
+        self._program_ranks_top(["9", "9", "2", "2", "Q", "K"])
+
+    def deck_for_surrender(self):
+        self._program_ranks_top(["9", "K", "7", "6"])

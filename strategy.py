@@ -125,22 +125,26 @@ class BlackJackStrategy:
         if len(player_hand) < 2:
             raise ValueError("player hand must have at least 2 cards")
         
+        dealer_card_rank = dealer_card.rank
+        if dealer_card.rank in ["J", "Q", "K"]:
+            dealer_card_rank = "10" 
+        
         #Pairs
         if len(player_hand) == 2 and BlackJackEval.can_split(player_hand):
-            correct_move = cls.PAIR_STRATEGY[player_hand.cards[0].rank][dealer_card.rank]
+            correct_move = cls.PAIR_STRATEGY[player_hand.cards[0].rank][dealer_card_rank]
 
             return correct_move
         
         #Softs
         if BlackJackEval.soft(player_hand):
             value = BlackJackEval.value(player_hand)
-            correct_move = cls.SOFT_STRATEGY[value][dealer_card.rank]
+            correct_move = cls.SOFT_STRATEGY[value][dealer_card_rank]
 
             return correct_move
         
         #Hards
         value = BlackJackEval.value(player_hand)
-        correct_move = cls.HARD_STRATEGY[value][dealer_card.rank]
+        correct_move = cls.HARD_STRATEGY[value][dealer_card_rank]
 
         if correct_move == cls.Action.DOUBLE and len(player_hand) > 2:
             correct_move = cls.Action.HIT

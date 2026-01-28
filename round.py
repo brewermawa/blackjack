@@ -1,5 +1,6 @@
 from cards.card import Card
 from cards.deck import Deck
+from fixed_deck import FixedDeck
 from cards.hand import Hand
 from roundoutcome import RoundOutcome
 from strategy import BlackJackStrategy
@@ -27,12 +28,15 @@ class BlackJackRound:
         self.player_hand.add_card(self.deck.draw()[0])
         self.dealer_hand.add_card(self.deck.draw()[0])
 
-    def _surrender(self) -> bool:
+    def _blackjack(self) -> bool:
         pass
 
+    def _surrender(self) -> bool:
+        return BlackJackStrategy.strategy(self.player_hand, self.dealer_hand.cards[0]) == BlackJackStrategy.Action.SURRENDER
+            
+
     def _player_turn(self):
-        if self._surrender():
-            return [RoundOutcome.HALF_PAY]
+        pass
 
     def _dealer_turn(self):
         pass
@@ -45,6 +49,12 @@ class BlackJackRound:
         print(f"Player: {self.player_hand}")
         print(f"Dealer: {self.dealer_hand}")
 
+        if self._surrender():
+            return [RoundOutcome.HALF_PAY]
+        
+        if self._blackjack():
+            return [RoundOutcome.BLACKJACK]
+
         self._player_turn()
         self._dealer_turn()
         self._compare()
@@ -53,9 +63,10 @@ class BlackJackRound:
 
 
 if __name__ == "__main__":
-    deck = Deck()
+    deck = FixedDeck()
+    deck.deck_for_surrender()
     bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
-    bj_round.play()
+    print(bj_round.play())
 
 
     

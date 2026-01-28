@@ -147,7 +147,7 @@ Represents a single complete round of Blackjack, from the initial deal until a t
 
 
 ## Inputs
-- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises ValueError. The deck should not contain jokers, if it does, raises ValuError.
+- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises ValueError. The deck should not contain jokers, if it does, raises ValueError.
 
 - hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises ValueError if hits_soft_17 is not bool.
 
@@ -161,7 +161,7 @@ Represents a single complete round of Blackjack, from the initial deal until a t
 - play():
 * Handles card dealing. Uses BlackJackEval and BlackJackStrategy to control the flow of the round
 
-* Returns the round result: This will be a list with a length equal to how many hands the players had. Examples: the player did not split, returns a list with one item. The player split once, returns a list with two items.
+* Returns the round result: This will be a list with a length equal to how many hands the players had. In  this initial version split will not be implemented. The list returned will be of length 1
 
 * The possible items returned in the results list are members of Class RoundOutcome
 
