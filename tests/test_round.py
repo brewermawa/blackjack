@@ -70,7 +70,8 @@ class TestRound:
     @pytest.mark.parametrize(
         "setup_method",
         [
-            #"deck_for_bj",
+            "deck_for_bj",
+            "deck_for_surrender",
             "deck_for_win"
         ]
     )
@@ -85,18 +86,27 @@ class TestRound:
         assert isinstance(outcomes, list)
         assert isinstance(outcomes[0], RoundOutcome)
 
-    """
+    
     @pytest.mark.parametrize(
         "setup_method, expected_outcomes",
         [
-            #("deck_for_bj", [RoundOutcome.BLACKJACK]),
-            #("deck_for_win", [RoundOutcome.WIN]),
-            #("deck_for_loss", [RoundOutcome.LOSS]),
-            #("deck_for_push", [RoundOutcome.PUSH]),
-            #("deck_for_double_win", [RoundOutcome.DOUBLE_WIN]),
-            #("deck_for_double_loss", [RoundOutcome.DOUBLE_LOSS]),
-            #("deck_for_double_push", [RoundOutcome.PUSH]),
+            ("deck_for_bj", [RoundOutcome.BLACKJACK]),
+            ("deck_for_win", [RoundOutcome.WIN]),
+            ("deck_for_win_with_hit", [RoundOutcome.WIN]),
+            ("deck_for_loss", [RoundOutcome.LOSS]),
+            ("deck_for_bust_after_hit", [RoundOutcome.LOSS]),
+            ("deck_for_push", [RoundOutcome.PUSH]),
+            ("deck_for_double_win", [RoundOutcome.DOUBLE_WIN]),
+            ("deck_for_double_loss", [RoundOutcome.DOUBLE_LOSS]),
+            ("deck_for_double_push", [RoundOutcome.PUSH]),
             ("deck_for_surrender", [RoundOutcome.HALF_PAY]),
+            ("deck_for_dealer_bust", [RoundOutcome.WIN]),
+            ("deck_for_dealer_bj", [RoundOutcome.LOSS]),
+            ("deck_for_bj_push", [RoundOutcome.PUSH]),
+            ("deck_for_soft_hits_17_false_push", [RoundOutcome.PUSH]),
+            ("deck_for_player_double_loss", [RoundOutcome.DOUBLE_LOSS]),
+            ("deck_for_win_with_two_hits", [RoundOutcome.WIN]),
+            ("deck_for_loss_with_two_hits", [RoundOutcome.LOSS]),
             
         ]
     )
@@ -104,8 +114,63 @@ class TestRound:
         deck = FixedDeck()
         getattr(deck, setup_method)()
 
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert outcomes == expected_outcomes
+
+
+    @pytest.mark.parametrize(
+        "setup_method, expected_outcomes",
+        [
+            ("deck_for_soft_hits_17_true_player_wins", [RoundOutcome.WIN]),
+            ("deck_for_soft_hits_17_true_player_loss", [RoundOutcome.LOSS]),
+            ("deck_for_soft_hits_17_true_push", [RoundOutcome.PUSH]),
+        ]
+    )
+    def test_play_returns_expected_outcome_for_hits_soft_17_true(self, setup_method, expected_outcomes):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
         bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
         outcomes = bj_round.play()
 
         assert outcomes == expected_outcomes
-    """
+
+
+    @pytest.mark.parametrize(
+        "setup_method",
+        [
+            "deck_for_split",
+        ]
+    )
+    def test_play_raises_valueerror_for_split_version_one_only(self, setup_method):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
+
+        with pytest.raises(NotImplementedError):
+            bj_round.play()
+
+
+    @pytest.mark.parametrize(
+        "setup_method",
+        [
+            "deck_for_player_bust",
+        ]
+    )
+    def test_play_player_busts_dealer_has_two_cards(self, setup_method):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
+        bj_round.play()
+
+        assert len(bj_round.dealer_hand) == 2
+        assert len(bj_round.player_hand) >= 3
+
+
+
+    
+    

@@ -41,8 +41,14 @@ class FixedDeck(Deck):
     def deck_for_win(self):
         self._program_ranks_top(["10", "6", "K", "9", "8"])
 
+    def deck_for_win_with_hit(self):
+        self._program_ranks_top(["10", "8", "2", "9", "8"])
+
     def deck_for_loss(self):
         self._program_ranks_top(["9", "K", "8", "9"])
+
+    def deck_for_bust_after_hit(self):
+        self._program_ranks_top(["9", "8", "6", "9", "Q"])
 
     def deck_for_push(self):
         self._program_ranks_top(["10", "9", "7", "8"])
@@ -73,3 +79,39 @@ class FixedDeck(Deck):
 
     def deck_for_surrender(self):
         self._program_ranks_top(["9", "K", "7", "6"])
+
+    def deck_for_dealer_bust(self):
+        self._program_ranks_top(["9", "9", "6", "7", "6", "Q"])
+
+    def deck_for_dealer_bj(self):
+        self._program_ranks_top(["9", "A", "6", "K", "6", "Q"])
+
+    def deck_for_bj_push(self):
+        self._program_ranks_top(["Q", "A", "A", "10", "6", "Q"])
+
+    def deck_for_soft_hits_17_false_push(self):
+        self._program_ranks_top(["Q", "A", "7", "6", "6", "Q"])
+
+    def deck_for_soft_hits_17_true_player_wins(self):
+        self._program_ranks_top(["Q", "A", "7", "6", "6", "Q"])
+
+    def deck_for_soft_hits_17_true_player_loss(self):
+        self._program_ranks_top(["Q", "A", "7", "6", "4", "Q"])
+
+    def deck_for_soft_hits_17_true_push(self):
+        self._program_ranks_top(["Q", "A", "7", "6", "10", "Q"])
+
+    def deck_for_split(self):
+        self._program_ranks_top(["8", "A", "8", "6", "10", "Q"])
+
+    def deck_for_player_bust(self):
+        self._program_ranks_top(["10", "7", "6", "Q", "10"])
+
+    def deck_for_player_double_loss(self):
+        self._program_ranks_top(["5", "8", "5", "Q", "7"])
+
+    def deck_for_win_with_two_hits(self):
+        self._program_ranks_top(["5", "8", "2", "Q", "3", "K"])
+
+    def deck_for_loss_with_two_hits(self):
+        self._program_ranks_top(["5", "8", "2", "Q", "3", "7"])

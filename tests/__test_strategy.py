@@ -116,6 +116,9 @@ class TestBlackJackStrategy:
     dealer_8  = Card("8","♣")
     dealer_9  = Card("9","♣")
     dealer_10 = Card("10","♣")
+    dealer_J = Card("J", "♣")
+    dealer_Q = Card("Q", "♣")
+    dealer_K = Card("K", "♣")
     dealer_A  = Card("A","♣")
 
 
@@ -164,6 +167,7 @@ class TestBlackJackStrategy:
             #5-8 always hit
             (hand_32, dealer_6, BlackJackStrategy.Action.HIT),
             (hand_53, dealer_2, BlackJackStrategy.Action.HIT),
+            (hand_53, dealer_J, BlackJackStrategy.Action.HIT),
 
             #double down
             (hand_63, dealer_5, BlackJackStrategy.Action.DOUBLE),
@@ -171,6 +175,7 @@ class TestBlackJackStrategy:
             (hand_82, dealer_9, BlackJackStrategy.Action.DOUBLE),
             (hand_92, dealer_3, BlackJackStrategy.Action.DOUBLE),
             (hand_92, dealer_10, BlackJackStrategy.Action.DOUBLE),
+            (hand_92, dealer_Q, BlackJackStrategy.Action.DOUBLE),
 
             #edge cases double down
             (hand_63, dealer_2, BlackJackStrategy.Action.HIT),
@@ -196,6 +201,7 @@ class TestBlackJackStrategy:
             (hand_96, dealer_A, BlackJackStrategy.Action.HIT),
             (hand_97, dealer_9, BlackJackStrategy.Action.SURRENDER),
             (hand_97, dealer_10, BlackJackStrategy.Action.SURRENDER),
+            (hand_97, dealer_K, BlackJackStrategy.Action.SURRENDER),
             (hand_97, dealer_A, BlackJackStrategy.Action.SURRENDER),
 
             #17+
@@ -212,7 +218,6 @@ class TestBlackJackStrategy:
         ]
     )
     def test_strategy_returns_correct_action_with_hard_hands(self, player_hand, dealer_card, expected):
-        print(player_hand, dealer_card)
         assert BlackJackStrategy.strategy(player_hand, dealer_card) == expected
 
     @pytest.mark.parametrize(
