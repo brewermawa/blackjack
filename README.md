@@ -94,114 +94,6 @@ R = Surrender
 Decision priority follows standard blackjack rules: pairs first, then soft totals, then hard totals.
 
 
-# BlackJackRound
-
-Represents a single complete round of Blackjack, from the initial deal until a terminal outcome is reached.
-
-## Scope
-
-- Deals only with the current round. Does not care about bet size or how many cards are in the shoe (the calling class BlackJackSimulator is in charge of the shoe/deck).
-
-- BlackJackRound is responsible for resolving all hands derived from a single initial player hand, including splits.
-
-- Returns the result to the calling function/method
-
-- Uses BlackJackEval and BlackjackStrategy methods to control the flow of the game
-
-
-## Inputs
-- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises ValueError. The deck should not contain jokers, if it does, raises ValuError.
-
-- hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises ValueError if hits_soft_17 is not bool.
-
-## Atrubutes
-- player_hand: an instance of Hand class. Contains the player cards. When the BlackJackRound class is initialized, player_hand is created but no cards are added
-- dealer_hand: an instance of Hand class. Contains the dealer cards. When the BlackJackRound class is initialized, dealer_hand is created but no cards are added
-
-
-## Methods
-- play():
-* Handles card dealing. Uses BlackJackEval and BlackJackStrategy to control the flow of the round
-
-* Returns the round result: This will be a list with a length equal to how many hands the players had. Examples: the player did not split, returns a list with one item. The player split once, returns a list with two items.
-
-* The possible items returned in the results list are members of Class RoundOutcome
-
-
-## Invariants
-
-- All cards used during the round must be drawn from the provided deck.
-
-- A hand can only have exactly one outcome. Once the outcome is reached, no more cards should be dealt to that hand
-
-- A round always terminates once all player hands and the dealer hand reach a terminal state.
-
-## Algorithm
-1. Initial Deal
-    1. Deal card to player
-    2. Deal card to dealer
-    3. Deal card to player
-    4. Deal card to dealer
-
-**Notes:**
-- For the following steps, BlackJackRound uses BlackJackEval to evaluate the hand.
-- BlackJackRound uses BlackJackStrategy to make decisions
-
-2. Blackjack
-    1. Blackjack for the dealer?
-        1. (yes) Blackjack for the player?
-            1. (yes) return [PUSH]
-            2. (no) return [LOSS]
-        2. (no) Blackjack for the player?
-            1. (yes) return [BLACKJACK]
-            2. (no) continue round
-
-3. Surrender
-    1. BlackJackStrategy returns SURRENDER?
-        1. (yes) return [HALF_PAY] <!-- TODO: add HALF_PAY to RoundOutcome -->
-        2. (no) proceed to next step
-
-4. Split
-
-5. Double
-
-6. Normal play (no blackjack, no surrender, no split, no double)
-
-    1. Player turn
-        1. while True (until STAND or BUST)
-            1. is hand busted?
-                1. (yes) return [LOSS]
-                2. (no) proceed
-            2. Is player hand soft?
-                1. (no) BlackJackStrategy (hard table) returns action:
-                    1. HIT: draw one card, add it to player hand and continue loop
-                    2. STAND: break loop
-                2. (yes) BlackJackStrategy (soft table) returns action:
-                    1. HIT: draw one card, add it to player hand and continue loop
-                    2. STAND: break loop
-
-7. Dealer turn
-    1. while (
-            dealer hand value < 17
-            or (dealer hand is soft 17 and hits_soft_17 is True)
-        )
-        1. draw one card and add it to dealer hand
-        2. dealer hand busted?
-            1. (yes) return [WIN]
-            2. (no) continue loop
-
-8. Compare hands
-    1. player hand value > dealer hand value → return [WIN] or [DOUBLE_WIN] if player_doubled is true
-    2. player hand value < dealer hand value → return [LOSS]  or [DOUBLE_LOSS] if player_doubled is true
-    3. player hand value = dealer hand value → return [PUSH]
-
-
-
-
-        
-
-
-
 
 # RoundOutcome
 - RoundOutcome is a class that inherits from Enum.
@@ -212,6 +104,7 @@ Represents a single complete round of Blackjack, from the initial deal until a t
     LOSS
     DOUBLE_LOSS
     DOUBLE_WIN
+    HALF_PAY
 
 - RoundOutcome can be used by any ohter class that needs to react to the outcome of a blackjack hand
 
@@ -236,4 +129,321 @@ All te following methods will arrange the cards in the deck in an order that gua
 - deck_for_split_AA
 - deck_for_dealer_BJ
 - deck_for_split_then_double
+
+
+# BlackJackRound
+
+Represents a single complete round of Blackjack, from the initial deal until a terminal outcome is reached.
+
+## Scope
+
+- Deals only with the current round. Does not care about bet size or how many cards are in the shoe (the calling class BlackJackSimulator is in charge of the shoe/deck).
+
+- BlackJackRound is responsible for resolving all hands derived from a single initial player hand, including splits.
+
+- Returns the result to the calling function/method
+
+- Uses BlackJackEval and BlackjackStrategy methods to control the flow of the game
+
+
+## Inputs
+- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises ValueError. The deck should not contain jokers, if it does, raises ValueError.
+
+- hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises ValueError if hits_soft_17 is not bool.
+
+## Attributes
+- player_hand: an instance of Hand class. Contains the player cards. When the BlackJackRound class is initialized, player_hand is created but no cards are added
+- dealer_hand: an instance of Hand class. Contains the dealer cards. When the BlackJackRound class is initialized, dealer_hand is created but no cards are added
+- `player_doubled`: a flag that indicates whether the player executed a `DOUBLE` action in this round (per `BlackJackStrategy`).
+
+
+## Methods
+- play():
+* Handles card dealing. Uses BlackJackEval and BlackJackStrategy to control the flow of the round
+
+* Returns the round result: This will be a list with a length equal to how many hands the players had. In  this initial version split will not be implemented. The list returned will be of length 1
+
+* The possible items returned in the results list are members of Class RoundOutcome
+
+
+## Invariants
+
+- All cards used during the round must be drawn from the provided deck.
+
+- A hand can only have exactly one outcome. Once the outcome is reached, no more cards should be dealt to that hand
+
+- A round always terminates once all player hands and the dealer hand reach a terminal state.
+
+```markdown
+
+# Blackjack Round (`play()`) – High Level Design (Current Scope)
+
+> Scope note:  
+> At this stage, **split is intentionally excluded** to reduce complexity.  
+> The round supports a single player hand and a single dealer hand.
+
+---
+
+## Round Flow
+
+```
+initial_deal
+→ blackjack check
+→ surrender check
+→ player_turn
+→ dealer_turn
+→ compare_hands
+→ list[RoundOutcome]
+```
+
+`play()` always returns a **list of `RoundOutcome`**, even if there is only one outcome.
+
+---
+
+## Early Termination Rules
+
+Some stages may end the round immediately.
+
+### Terminator stages
+- `blackjack`
+- `surrender`
+
+If any of these stages returns an outcome:
+
+- the outcome is appended to the outcomes list
+- `play()` returns immediately
+
+If they return `None`, execution continues.
+
+---
+
+## Hand Model
+
+### Hand
+- Stores **only cards**
+- Does not store totals or flags
+
+### No state is persisted in `Hand`
+- no `is_bust`
+- no `total`
+- no `soft`
+- no `blackjack`
+
+All evaluations are computed dynamically.
+
+---
+
+## BlackJackEval Responsibilities
+
+`BlackJackEval` is responsible for all rule evaluation:
+
+- `total(hand)`
+- `is_soft(hand)`
+- `is_bust(hand)`
+- `is_blackjack(hand)`
+
+Evaluation is deterministic and stateless.
+
+---
+
+## BlackJackStrategy
+
+`BlackJackStrategy` decides the player action.
+
+### Action enum
+
+```python
+HIT
+STAND
+DOUBLE
+SPLIT
+SURRENDER
+```
+
+---
+
+## Player Turn
+
+### Preconditions
+
+- Blackjack already resolved
+- Surrender already resolved
+- Split is not supported
+
+
+### Valid actions in this phase
+
+- HIT
+- STAND
+- DOUBLE
+
+If the strategy returns `SPLIT` or `SURRENDER` here, it is considered an error.
+
+
+## Player Turn Contract
+
+### Inputs
+- `player_hand`
+- `dealer_up_card` (`dealer_hand[0]`)
+- `BlackJackStrategy`
+- `deck`
+
+### Side Effects
+- Draws cards from the deck
+- Modifies `player_hand`
+
+### Output
+- Returns nothing
+- Leaves the hand in a terminal state
+
+### Terminal states
+- STAND
+- BUST
+
+
+## Player Turn Pseudocode
+
+```text
+while True:
+
+    action = BlackJackStrategy.strategy(player_hand, dealer_up_card)
+
+    if action == HIT:
+        draw 1 card from deck
+        add card to player_hand
+
+        if BlackJackEval.is_bust(player_hand):
+            break
+        else:
+            continue
+
+    elif action == DOUBLE:
+        set player_doubled to True
+        draw 1 card from deck
+        add card to player_hand
+        break
+
+    elif action == STAND:
+        break
+
+    else:
+        error (invalid action for player_turn)
+```
+
+## Dealer Turn
+
+Dealer turn only executes if player_hand is not bust
+
+### Preconditions
+
+- Blackjack already resolved
+- Surrender already resolved
+- Player turn already resolved
+- Split is not supported
+
+## Dealer Turn Contract
+
+### Inputs
+- `dealer_hand`
+- `deck`
+- `BlackJackEval`
+- `hits_soft_17`
+
+
+### Side Effects
+- Draws cards from the deck
+- Modifies `dealer_hand`
+
+### Output
+- Returns nothing
+- Leaves dealer_hand in a terminal state
+
+### Terminal states
+- STAND
+- BUST
+
+## Dealer turn algorithm
+
+```text
+1. Dealer turn
+    1. while (
+            dealer hand value < 17
+            or (dealer hand is soft 17 and hits_soft_17 is True)
+        )
+        1. draw one card and add it to dealer hand
+        2. If bust, exit loop
+        3. If not bust, continue loop
+ ```
+
+
+## Compare hands
+
+After the player and dealer hands are in a terminal state, compares boths and returns a result
+
+### Preconditions
+
+- Blackjack already resolved
+- Surrender already resolved
+- Player turn already resolved
+- Dealer turn already resolved
+
+## Compare hands Contract
+
+
+### Inputs
+- `player_hand`
+- `dealer_hand`
+- `BlackJackEval`
+
+
+### Side Effects
+. No side effects
+
+### Output
+- Returns list[RoundOutcome]
+
+
+## Compare hands algorithm
+
+```text
+1. If player_hand is bust:
+       if player_doubled:
+           return [DOUBLE_LOSS]
+       else:
+           return [LOSS]
+
+2. If dealer_hand is bust:
+       if player_doubled:
+           return [DOUBLE_WIN]
+       else:
+           return [WIN]
+
+3. If value(player_hand) == value(dealer_hand):
+       return [PUSH]
+
+4. If value(player_hand) > value(dealer_hand):
+       if player_doubled:
+           return [DOUBLE_WIN]
+       else:
+           return [WIN]
+
+5. Else:
+       if player_doubled:
+           return [DOUBLE_LOSS]
+       else:
+           return [LOSS]
+
+```
+
+## Split
+BlackJackRound v2 – Split MVP
+
+Rules:
+- allow exactly one split
+- only when both cards have same rank
+- split aces receive one card and auto-stand
+- no DAS
+- no resplit
+- dealer plays once
+- outcomes list length == number of final hands
 
