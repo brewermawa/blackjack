@@ -439,11 +439,95 @@ After the player and dealer hands are in a terminal state, compares boths and re
 BlackJackRound v2 – Split MVP
 
 Rules:
-- allow exactly one split
-- only when both cards have same rank
-- split aces receive one card and auto-stand
-- no DAS
-- no resplit
-- dealer plays once
-- outcomes list length == number of final hands
+- Splits are only allowed on two cards of the same value (10, J, Q and K are considered the same value)
+- For this version only splitting one time is allowed
+- After the split, the 2 hands created are treated as regular hands.
+- After the split 2 hands exist: hand 1 and hand 2. hand 1 must be resolved according to BlackJackStrategy before dealing the second card to hand2
+- When splitting aces only an additional card is dealt per hand.
+- When splitting, the second card of the original hand (hand[1]) is moved to a new hand. Because the card vallues are the same in the original hand, its really irrelevant which card is moved to the new hand but we must define it for this simulation
+- A blackjack after splitting (10s or As) is considered a normal win (no extra pay for blackjack, 3:2, 6:5, etc.)
+- No double after split allowed in this version
+- As with any other player hand, dealer play is not affected
+- ValueError if BlackJackStrategy returns DOUBLE or SURRENDER
+- Each hand has a separate result, play will return a list with the outcome of both hands
+- If a split occurs, play() returns a list of length 2; otherwise length 1.
+- BlackJackStrategy is the only decision maker
+- Surrender is not available after split
+- Each hand has independent state (e.g., doubled flag, outcome).
 
+
+
+
+Paso 1 — Reemplazar el NotImplementedError por “estructura split mínima”
+
+Objetivo: que el primer test de split deje de morir por NotImplementedError y empiece a fallar “más cerca” de la lógica real.
+
+Cuando Strategy pida SPLIT:
+
+crear player_hands = [hand1, hand2]
+
+repartir una carta a hand1 (segunda carta) y resolver hand1 completo
+
+repartir una carta a hand2 (segunda carta) y resolver hand2 completo
+
+dealer juega al final
+
+comparar y devolver 2 outcomes
+
+En este paso no metas todavía aces special-case ni errores post-split; solo estructura.
+
+Esperado: tus tests E2E de split ahora fallan por outcomes incorrectos (perfecto).
+
+
+Paso 2 — Implementar Variante A (si no quedó)
+
+La regla clave:
+
+NO repartir segunda carta de hand2 hasta que hand1 termine.
+
+Tu deck win/loss ya es “tripwire”: si te equivocas, outcomes cambian.
+
+Esperado: el E2E de split empieza a acercarse a verde.
+
+
+Paso 3 — Aplicar prohibiciones post-split (tu test parametrizado)
+
+Dentro del loop de decisiones de una mano spliteada:
+
+si Strategy devuelve DOUBLE → ValueError
+
+si devuelve SURRENDER → ValueError
+
+si devuelve SPLIT → ValueError
+
+Esperado: tu test parametrizado se pone verde.
+
+
+Paso 4 — Split Aces special-case
+
+Cuando el split original sea A,A:
+
+cada mano recibe exactamente 1 carta
+
+auto-stand (no loop HIT/STAND)
+
+outcome de A+10-value debe tratarse como WIN normal, no BLACKJACK
+
+Tus dos tests de aces cubren esto:
+
+AA_win_win (no blackjack outcome)
+
+AA_only_one_extra_card_per_hand (len(hand)==2)
+
+Esperado: esos dos tests se ponen verdes.
+
+
+Paso 5 — Dealer una sola vez al final
+
+Asegurar que:
+
+dealer turn sucede una vez después de resolver todas las manos
+
+ambas manos comparan contra el mismo dealer_hand
+
+Tu E2E base y AA cases normalmente lo delatan si algo está mal.

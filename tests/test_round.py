@@ -6,7 +6,6 @@ from cards.deck import Deck
 from fixed_deck import FixedDeck
 
 class TestRound:
-    """
     @pytest.mark.parametrize(
         "deck",
         [
@@ -50,6 +49,7 @@ class TestRound:
         assert len(bj_round.player_hand) == 0
         assert len(bj_round.dealer_hand) == 0
 
+
     def test_play_returns_only_valid_roundoutcomes(self):
         VALID_VALUES = set(RoundOutcome)
 
@@ -64,9 +64,8 @@ class TestRound:
 
         for r in results:
             assert r in VALID_VALUES
-    """
 
-
+            
     @pytest.mark.parametrize(
         "setup_method",
         [
@@ -141,22 +140,6 @@ class TestRound:
     @pytest.mark.parametrize(
         "setup_method",
         [
-            "deck_for_split",
-        ]
-    )
-    def test_play_raises_valueerror_for_split_version_one_only(self, setup_method):
-        deck = FixedDeck()
-        getattr(deck, setup_method)()
-
-        bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
-
-        with pytest.raises(NotImplementedError):
-            bj_round.play()
-
-
-    @pytest.mark.parametrize(
-        "setup_method",
-        [
             "deck_for_player_bust",
         ]
     )
@@ -171,6 +154,68 @@ class TestRound:
         assert len(bj_round.player_hand) >= 3
 
 
+    @pytest.mark.parametrize(
+        "setup_method",
+        [
+            "deck_for_split",
+            "deck_for_split_push",
+            "deck_for_split_win_both",
+            "deck_for_split_win_one_loose_one",
+            "deck_for_split_AA",
+        ]
+    )
+    def test_split_creates_two_hands_and_returns_list_with_two_outcomes(self, setup_method):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+        
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
+        outcomes = bj_round.play()
 
-    
-    
+        assert len(bj_round.player_hands) == 2
+        assert len(outcomes) == 2
+
+    @pytest.mark.parametrize(
+        "setup_method, expected_outcomes",
+        [
+            ("deck_for_split_win_one_loss_one", [RoundOutcome.WIN, RoundOutcome.LOSS]),
+            ("deck_for_split_AA_win_win", [RoundOutcome.WIN, RoundOutcome.WIN]),
+        ]
+    )
+    def test_split_returns_expected_outcomes(self, setup_method, expected_outcomes):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert len(bj_round.player_hands) == 2
+        assert outcomes == expected_outcomes
+
+    def test_split_aces_only_deals_one_extra_card_each_hand(self):
+        deck = FixedDeck()
+        deck.deck_for_split_AA_only_one_extra_card_per_hand()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert len(bj_round.player_hands) == 2
+        assert len(bj_round.player_hands[0]) == 2
+        assert len(bj_round.player_hands[1]) == 2
+        assert len(outcomes) == 2
+
+
+    @pytest.mark.parametrize(
+        "setup_method",
+        [
+            "deck_for_split_then_double",
+            "deck_for_split_then_surrender",
+            "deck_for_split_then_resplit",
+        ]
+    )
+    def test_split_mvp_forbidden_actions_after_split_raise_valueerror(self, setup_method):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        with pytest.raises(ValueError):
+            bj_round.play()
