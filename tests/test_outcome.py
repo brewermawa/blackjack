@@ -14,8 +14,8 @@ class TestOutcome:
         assert issubclass(RoundOutcome, Enum)
 
 
-    def test_roundoutcome_has_exactly_six_members(self):
-        assert len(RoundOutcome) == 6
+    def test_roundoutcome_has_exactly_seven_members(self):
+        assert len(RoundOutcome) == 7
 
 
     def test_roundoutcome_contains_win_loss_push_blackjack(self):

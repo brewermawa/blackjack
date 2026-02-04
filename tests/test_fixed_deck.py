@@ -35,9 +35,8 @@ class TestFixedDeck:
             ("deck_for_double_loss", ["9", "6", "2", "5", "9", "J"]),
             ("deck_for_split_push", ["8", "9", "8", "9", "K", "Q"]),
             ("deck_for_split_win_both", ["8", "6", "8", "10", "K", "Q", "9"]),
-            ("deck_for_split_win_one_loose_one", ["8", "6", "8", "10", "K", "9", "10"]),
-            ("deck_for_split_AA", ["A", "9", "A", "10", "5", "K"]),
-            ("deck_for_split_then_double", ["6", "5", "6", "10", "J", "J"]),
+            ("deck_for_split_win_one_loss_one", ["8", "8", "8", "9", "4", "9", "6", "10"]),
+            ("deck_for_split_AA_win_win", ["A", "9", "A", "10", "J", "K"]),
         ],
     )
     def test_fixeddeck_scenarios_initial_order(self, setup_method: str, expected_first_n_ranks: list[str]):

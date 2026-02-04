@@ -455,79 +455,40 @@ Rules:
 - Surrender is not available after split
 - Each hand has independent state (e.g., doubled flag, outcome).
 
+## v3.0 (DAS and SURRENDRER -> HIT after split)
+- DAS (Double After Split): after a split, if Strategy returns DOUBLE for a specific split hand, deal exactly one additional card to that hand and end that hand immediately. The outcome for that hand must be evaluated as a double (DOUBLE_WIN, DOUBLE_LOSS, or PUSH).
+- Surrender fallback after split: after a split, if Strategy returns SURRENDER, treat it as HIT (draw one card) and continue play normally. This mapping applies every time SURRENDER is returned in a split-hand context.
 
+## v4.0 Allow resplits
+1) Maximum Splits
+The player may perform up to 3 splits, resulting in a maximum of 4 player hands.
+Any attempt to split beyond this limit must raise NotImplementedError.
 
+2) Resplit Policy
+Resplitting aces is not allowed.
+If Strategy returns SPLIT for a hand that originated from split aces, the engine must raise NotImplementedError.
 
-Paso 1 — Reemplazar el NotImplementedError por “estructura split mínima”
+3) Per-Hand Split Limit
+Each individual hand may be split at most once.
+A split operation creates exactly one additional hand.
 
-Objetivo: que el primer test de split deje de morir por NotImplementedError y empiece a fallar “más cerca” de la lógica real.
+4) Generalized Variant A (Multi-Hand)
+Player hands are resolved sequentially in creation order.
+For each hand:
+The second card is dealt (if needed).
+The hand is fully resolved before the next hand receives its second card.
+This ordering applies across all split levels.
 
-Cuando Strategy pida SPLIT:
+5) Split Aces Constraint (Reaffirmed for Multi-Split)
+When aces are split:
+Each resulting hand receives exactly one additional card.
+Each hand automatically stands.
+This rule applies regardless of how many total hands exist due to prior splits.
 
-crear player_hands = [hand1, hand2]
+6) Dealer Resolution with Multi-Hands
+The dealer plays exactly once, after all player hands (including all split hands) have been fully resolved.
+All player hands are compared against the same final dealer hand.
 
-repartir una carta a hand1 (segunda carta) y resolver hand1 completo
-
-repartir una carta a hand2 (segunda carta) y resolver hand2 completo
-
-dealer juega al final
-
-comparar y devolver 2 outcomes
-
-En este paso no metas todavía aces special-case ni errores post-split; solo estructura.
-
-Esperado: tus tests E2E de split ahora fallan por outcomes incorrectos (perfecto).
-
-
-Paso 2 — Implementar Variante A (si no quedó)
-
-La regla clave:
-
-NO repartir segunda carta de hand2 hasta que hand1 termine.
-
-Tu deck win/loss ya es “tripwire”: si te equivocas, outcomes cambian.
-
-Esperado: el E2E de split empieza a acercarse a verde.
-
-
-Paso 3 — Aplicar prohibiciones post-split (tu test parametrizado)
-
-Dentro del loop de decisiones de una mano spliteada:
-
-si Strategy devuelve DOUBLE → ValueError
-
-si devuelve SURRENDER → ValueError
-
-si devuelve SPLIT → ValueError
-
-Esperado: tu test parametrizado se pone verde.
-
-
-Paso 4 — Split Aces special-case
-
-Cuando el split original sea A,A:
-
-cada mano recibe exactamente 1 carta
-
-auto-stand (no loop HIT/STAND)
-
-outcome de A+10-value debe tratarse como WIN normal, no BLACKJACK
-
-Tus dos tests de aces cubren esto:
-
-AA_win_win (no blackjack outcome)
-
-AA_only_one_extra_card_per_hand (len(hand)==2)
-
-Esperado: esos dos tests se ponen verdes.
-
-
-Paso 5 — Dealer una sola vez al final
-
-Asegurar que:
-
-dealer turn sucede una vez después de resolver todas las manos
-
-ambas manos comparan contra el mismo dealer_hand
-
-Tu E2E base y AA cases normalmente lo delatan si algo está mal.
+7) Outcome Ordering
+play() returns a list of outcomes whose length equals the final number of player hands.
+Outcomes are returned in the same order as the corresponding player hands were created.

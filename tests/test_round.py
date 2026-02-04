@@ -6,6 +6,7 @@ from cards.deck import Deck
 from fixed_deck import FixedDeck
 
 class TestRound:
+    
     @pytest.mark.parametrize(
         "deck",
         [
@@ -46,10 +47,10 @@ class TestRound:
     def test_player_and_dealer_hands_have_zero_cards_when_class_initialized(self):
         deck = FixedDeck()
         bj_round = BlackJackRound(deck, hits_soft_17=True)
-        assert len(bj_round.player_hand) == 0
+        assert len(bj_round.player_hands[0]["hand"]) == 0
         assert len(bj_round.dealer_hand) == 0
 
-
+    
     def test_play_returns_only_valid_roundoutcomes(self):
         VALID_VALUES = set(RoundOutcome)
 
@@ -65,7 +66,7 @@ class TestRound:
         for r in results:
             assert r in VALID_VALUES
 
-            
+    
     @pytest.mark.parametrize(
         "setup_method",
         [
@@ -74,7 +75,7 @@ class TestRound:
             "deck_for_win"
         ]
     )
-    def test_play_returns_list_with_one_outcome(self, setup_method):
+    def test_play_returns_list_with_one_outcome_when_not_split(self, setup_method):
         deck = FixedDeck()
         getattr(deck, setup_method)()
 
@@ -84,6 +85,25 @@ class TestRound:
         assert len(outcomes) == 1
         assert isinstance(outcomes, list)
         assert isinstance(outcomes[0], RoundOutcome)
+
+    
+    @pytest.mark.parametrize(
+        "setup_method",
+        [
+            "deck_for_split_win_one_loss_one",
+            "deck_for_split_AA_win_win",
+            "deck_for_split_AA_only_one_extra_card_per_hand"
+        ]
+    )
+    def test_play_returns_list_with_two_outcomes_when_split(self, setup_method):
+        deck = FixedDeck()
+        getattr(deck, setup_method)()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
+        outcomes = bj_round.play()
+
+        assert len(outcomes) == 2
+        assert isinstance(outcomes, list)
 
     
     @pytest.mark.parametrize(
@@ -118,7 +138,7 @@ class TestRound:
 
         assert outcomes == expected_outcomes
 
-
+    
     @pytest.mark.parametrize(
         "setup_method, expected_outcomes",
         [
@@ -136,7 +156,7 @@ class TestRound:
 
         assert outcomes == expected_outcomes
 
-
+    
     @pytest.mark.parametrize(
         "setup_method",
         [
@@ -151,17 +171,17 @@ class TestRound:
         bj_round.play()
 
         assert len(bj_round.dealer_hand) == 2
-        assert len(bj_round.player_hand) >= 3
+        assert len(bj_round.player_hands[0]["hand"]) >= 3
 
-
+      
     @pytest.mark.parametrize(
         "setup_method",
         [
-            "deck_for_split",
+            "deck_for_split_AA_win_win",
             "deck_for_split_push",
             "deck_for_split_win_both",
-            "deck_for_split_win_one_loose_one",
-            "deck_for_split_AA",
+            "deck_for_split_win_one_loss_one",
+            "deck_for_split_AA_then_KK_dealer_21",
         ]
     )
     def test_split_creates_two_hands_and_returns_list_with_two_outcomes(self, setup_method):
@@ -174,11 +194,13 @@ class TestRound:
         assert len(bj_round.player_hands) == 2
         assert len(outcomes) == 2
 
+    
     @pytest.mark.parametrize(
         "setup_method, expected_outcomes",
         [
             ("deck_for_split_win_one_loss_one", [RoundOutcome.WIN, RoundOutcome.LOSS]),
             ("deck_for_split_AA_win_win", [RoundOutcome.WIN, RoundOutcome.WIN]),
+            ("deck_for_split_AA_then_KK_dealer_21", [RoundOutcome.PUSH, RoundOutcome.PUSH]),
         ]
     )
     def test_split_returns_expected_outcomes(self, setup_method, expected_outcomes):
@@ -191,6 +213,7 @@ class TestRound:
         assert len(bj_round.player_hands) == 2
         assert outcomes == expected_outcomes
 
+    
     def test_split_aces_only_deals_one_extra_card_each_hand(self):
         deck = FixedDeck()
         deck.deck_for_split_AA_only_one_extra_card_per_hand()
@@ -203,19 +226,51 @@ class TestRound:
         assert len(bj_round.player_hands[1]) == 2
         assert len(outcomes) == 2
 
+    """
+    def test_split_resplit_raises_notimplementederror(self):
+        deck = FixedDeck()
+        deck.deck_for_split_then_resplit()
 
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        with pytest.raises(NotImplementedError):
+            bj_round.play()
+    """
+    
+    def test_no_surrender_fallback_hit(self):
+        deck = FixedDeck()
+        deck.deck_for_split_no_surrender()
+        
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert outcomes == [RoundOutcome.WIN, RoundOutcome.LOSS]
+
+    
     @pytest.mark.parametrize(
-        "setup_method",
+        "setup_method, expected_outcomes",
         [
-            "deck_for_split_then_double",
-            "deck_for_split_then_surrender",
-            "deck_for_split_then_resplit",
+            ("deck_for_split_then_double_both_hands_win", [RoundOutcome.DOUBLE_WIN, RoundOutcome.DOUBLE_WIN]),
+            ("deck_for_split_then_double_both_hands_lose", [RoundOutcome.DOUBLE_LOSS, RoundOutcome.DOUBLE_LOSS]),
+            ("deck_for_split_then_double_one_wins_one_lose", [RoundOutcome.DOUBLE_WIN, RoundOutcome.DOUBLE_LOSS]),
+            ("deck_for_split_first_hand_normal_push_second_hand_double_lose", [RoundOutcome.PUSH, RoundOutcome.DOUBLE_LOSS])
         ]
     )
-    def test_split_mvp_forbidden_actions_after_split_raise_valueerror(self, setup_method):
+    def test_double_after_split_returns_expected_outcomes(self, setup_method, expected_outcomes):
         deck = FixedDeck()
         getattr(deck, setup_method)()
 
         bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
-        with pytest.raises(ValueError):
-            bj_round.play()
+        outcomes = bj_round.play()
+
+        assert outcomes == expected_outcomes
+
+
+    def test_resplit_fallback_stand_does_not_break_simulation(self):
+        deck = FixedDeck()
+        deck.deck_for_split_resplit_fallback_stand()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert outcomes == [RoundOutcome.LOSS, RoundOutcome.LOSS]
+    

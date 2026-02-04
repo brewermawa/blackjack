@@ -106,15 +106,11 @@ class FixedDeck(Deck):
         """
         self._program_ranks_top(["8", "8", "8", "9", "4", "9", "6", "10"])
 
-
     def deck_for_split_push(self):
         self._program_ranks_top(["8", "9", "8", "9", "K", "Q"])
 
     def deck_for_split_win_both(self):
         self._program_ranks_top(["8", "6", "8", "10", "K", "Q", "9"])
-
-    def deck_for_split_win_one_loose_one(self):
-        self._program_ranks_top(["8", "6", "8", "10", "K", "9", "10"])
 
     def deck_for_split_AA_win_win(self):
         """
@@ -133,27 +129,74 @@ class FixedDeck(Deck):
         """
         self._program_ranks_top(["A", "8", "A", "9", "5", "4"])
 
-    def deck_for_split_then_double(self):
+    def deck_for_split_AA_then_KK_dealer_21(self):
         """
-        dealer_hand: 5, 10
-        player_hand[0]: 6, 5 (strategy returns double -> ValueError)
-        player_hand[1]: 6
+        dealer_hand: 9, 2, Q
+        player_hand[0]: A, K
+        player_hand[1]: A, K
         """
-        self._program_ranks_top(["6", "5", "6", "10", "5"])
+        self._program_ranks_top(["A", "9", "A", "2", "K", "K", "Q"])
 
-    def deck_for_split_then_surrender(self):
+    def deck_for_split_then_double_both_hands_win(self):
         """
-        dealer_hand: 10, 5
-        player_hand[0]: 6, 10 (strategy returns surrender -> ValueError)
-        player_hand[1]: 6
+        dealer_hand: 5, 10, 9
+        player_hand[0]: 6, 5, 10
+        player_hand[1]: 6, 5, J
         """
-        self._program_ranks_top(["6", "10", "6", "5", "10"])
+        self._program_ranks_top(["6", "5", "6", "10", "5", "10", "5", "J", "9"])
+
+    def deck_for_split_then_double_both_hands_lose(self):
+        """
+        dealer_hand: 6, 10, 5
+        player_hand[0]: 6, 5, 6
+        player_hand[1]: 6, 4, 9
+        """
+        self._program_ranks_top(["6", "6", "6", "10", "5", "6", "4", "9", "5"])
+
+    def deck_for_split_then_double_one_wins_one_lose(self):
+        """
+        dealer_hand: 6, 10, 2
+        player_hand[0]: 6, 5, 9
+        player_hand[1]: 6, 4, 7
+        """
+        self._program_ranks_top(["6", "6", "6", "10", "5", "9", "4", "7", "2"])
+
+    def deck_for_split_first_hand_normal_push_second_hand_double_lose(self):
+        """
+        dealer_hand: 6, 10, 2
+        player_hand[0]: 6, 2, J
+        player_hand[1]: 6, 5, 6
+        """
+        self._program_ranks_top(["6", "6", "6", "10", "2", "J", "5", "6", "2"])
 
     def deck_for_split_then_resplit(self):
         """
         dealer_hand: 5, 10
-        player_hand[0]: 6, 6 (strategy returns split -> ValueError)
+        player_hand[0]: 6, 6 (strategy returns split -> NotImplementedError)
         player_hand[1]: 6
         """
         self._program_ranks_top(["6", "5", "6", "10", "6"])
+
+
+    def deck_for_split_no_surrender(self):
+        """
+        dealer_hand: 10, J
+        player_hand[0]: 8, 7 (strategy returns surrender -> fallback to hit) 6
+        player_hand[1]: 8, 2, 9
+
+        First hand wins, second loses
+        """
+        self._program_ranks_top(["8", "10", "8", "J", "7", "6", "2", "9"])
+
+
+    def deck_for_split_resplit_fallback_stand(self):
+        """
+        dealer_hand: 6, 10, 5  -> 21
+        player_hand[0]: 8, 8 (split)
+            -> receives 8  -> resplit requested -> fallback STAND (16)
+        player_hand[1]: 8, 4 -> 12
+
+        Both hands lose.
+        """
+        self._program_ranks_top(["8", "6", "8", "10", "8", "4", "5"])
 
