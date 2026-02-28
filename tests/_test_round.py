@@ -273,4 +273,24 @@ class TestRound:
         outcomes = bj_round.play()
 
         assert outcomes == [RoundOutcome.LOSS, RoundOutcome.LOSS]
+
+
+    def test_fallback_surrender_to_hit_more_that_2_cards(self):
+        deck = FixedDeck()
+        deck.deck_for_surrender_to_hit_when_more_than_2_cards()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert outcomes == [RoundOutcome.LOSS]
+
+
+    def test_soft_21_stops_play(self):
+        deck = FixedDeck()
+        deck.deck_for_soft_21()
+
+        bj_round = BlackJackRound(deck=deck, hits_soft_17=False)
+        outcomes = bj_round.play()
+
+        assert outcomes == [RoundOutcome.WIN]
     

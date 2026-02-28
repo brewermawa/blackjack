@@ -200,3 +200,19 @@ class FixedDeck(Deck):
         """
         self._program_ranks_top(["8", "6", "8", "10", "8", "4", "5"])
 
+
+    def deck_for_surrender_to_hit_when_more_than_2_cards(self):
+        """
+        dealer_hand: , 10, J
+        player_hand[0]: 3, 2, Q
+        """
+        self._program_ranks_top(["3", "10", "2", "J", "9"])
+
+
+    def deck_for_soft_21(self):
+        """
+        dealer_hand: 4 , A, 6
+        player_hand[0]: 3, 5, Q
+        """
+        self._program_ranks_top(["4", "3", "A", "5", "6", "Q"])
+

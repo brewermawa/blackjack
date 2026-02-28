@@ -68,12 +68,21 @@ class BlackJackRound:
             if len(player_hand["hand"].cards) == 1:
                 player_hand["hand"].add_card(self.deck.draw()[0])
 
-            while True:
+            while BlackJackEval.value(player_hand["hand"]) < 21:
                 if len(player_hand["hand"].cards) == 2 and BlackJackEval.blackjack(player_hand["hand"]):
                     break
                 if self._player_split and player_hand["hand"].cards[0].rank == "A":
                     break
                 action = BlackJackStrategy.strategy(player_hand["hand"], self.dealer_hand.cards[0])
+
+                if action == BlackJackStrategy.Action.SURRENDER:
+                    #In this situation, SURRENDER happened if the player has more than two cards or there was a split.
+                    #Since SURRENDER is not valid with wither more than 2 cards or after a split, it should be a hit
+                    player_hand["hand"].add_card(self.deck.draw()[0])
+                    
+                    if BlackJackEval.bust(player_hand["hand"]):
+                        break
+                    continue
                 
                 if action == BlackJackStrategy.Action.HIT:
                     player_hand["hand"].add_card(self.deck.draw()[0])
@@ -85,13 +94,6 @@ class BlackJackRound:
                     player_hand["doubled"] = True
                     player_hand["hand"].add_card(self.deck.draw()[0])
                     break
-                
-                elif action == BlackJackStrategy.Action.SURRENDER and self._player_split:
-                    player_hand["hand"].add_card(self.deck.draw()[0])
-                    
-                    if BlackJackEval.bust(player_hand["hand"]):
-                        break
-                    continue
                 
                 elif action == BlackJackStrategy.Action.SPLIT and self._player_split:
                     #raise NotImplementedError("Only one split in v2.0")
@@ -197,9 +199,10 @@ if __name__ == "__main__":
     #deck.deck_for_split_AA_win_win()
     #deck.deck_for_split_AA_then_KK_dealer_21()
     #deck.deck_for_split_AA_only_one_extra_card_per_hand()
-    deck.deck_for_split_win_one_loss_one()
+    #deck.deck_for_split_win_one_loss_one()
     #deck.deck_for_split_no_surrender()
     #deck.deck_for_double_loss()
+    deck.deck_for_surrender_to_hit_when_more_than_2_cards()
     bj_round = BlackJackRound(deck=deck, hits_soft_17=True)
     #bj_round.play()
     print(bj_round.play())

@@ -1,8 +1,12 @@
 import pytest
 
+from fixed_deck import FixedDeck
+from cards.hand import Hand
+from roundoutcome import RoundOutcome
 from strategy import BlackJackStrategy
 from cards.card import Card
 from cards.hand import Hand
+from round import BlackJackRound
 
 class TestBlackJackStrategy:
     #"♣", "♦", "♠", "♥"
@@ -105,6 +109,11 @@ class TestBlackJackStrategy:
     hand_A6T.add_card(Card("A","♣"))
     hand_A6T.add_card(Card("6","♦"))
     hand_A6T.add_card(Card("J","♣"))
+
+    hand_T24 = Hand()
+    hand_T24.add_card(Card("J","♣"))
+    hand_T24.add_card(Card("2","♦"))
+    hand_T24.add_card(Card("4","♣"))
 
 
     dealer_2  = Card("2","♣")
@@ -345,4 +354,7 @@ class TestBlackJackStrategy:
     def test_strategy_returns_correct_action_with_pair_hands(self, player_hand, dealer_card, expected):
         assert BlackJackStrategy.strategy(player_hand, dealer_card) == expected
 
+
+    def test_strategy_returns_hit_when_surrender_and_more_than_2_cards(self):
+        assert BlackJackStrategy.strategy(self.hand_T24, self.dealer_Q) == BlackJackStrategy.Action.HIT
 
