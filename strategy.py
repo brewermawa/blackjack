@@ -147,6 +147,9 @@ class BlackJackStrategy:
         if BlackJackEval.soft(player_hand):
             value = BlackJackEval.value(player_hand)
             correct_move = cls.SOFT_STRATEGY[value][dealer_card_rank]
+            
+            if correct_move == cls.Action.DOUBLE and len(player_hand) > 2:
+                correct_move = cls.Action.HIT
 
             return correct_move
         

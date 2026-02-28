@@ -115,6 +115,11 @@ class TestBlackJackStrategy:
     hand_T24.add_card(Card("2","♦"))
     hand_T24.add_card(Card("4","♣"))
 
+    hand_A32 = Hand()
+    hand_A32.add_card(Card("A","♣"))
+    hand_A32.add_card(Card("3","♦"))
+    hand_A32.add_card(Card("2","♣"))
+
 
     dealer_2  = Card("2","♣")
     dealer_3  = Card("3","♣")
@@ -357,4 +362,7 @@ class TestBlackJackStrategy:
 
     def test_strategy_returns_hit_when_surrender_and_more_than_2_cards(self):
         assert BlackJackStrategy.strategy(self.hand_T24, self.dealer_Q) == BlackJackStrategy.Action.HIT
+
+    def test_strategy_returns_hit_when_double_and_more_than_2_cards(self):
+        assert BlackJackStrategy.strategy(self.hand_A32, self.dealer_6) == BlackJackStrategy.Action.HIT
 
