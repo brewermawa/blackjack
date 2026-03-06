@@ -16,14 +16,9 @@ class TestRound:
             None,
         ]
     )
-    def test_raises_valueerror_if_deck_is_not_instance_of_deck(self, deck):
+    def test_raises_type_error_if_deck_is_not_instance_of_deck(self, deck):
         with pytest.raises(TypeError):
             BlackJackRound(deck, hits_soft_17=True)
-
-    
-    def test_does_not_raise_valueerror_if_deck_is_instance_of_deck(self):
-        deck = FixedDeck()
-        BlackJackRound(deck, hits_soft_17=True)
 
     
     def test_raises_value_error_if_deck_contains_jokers(self):
@@ -37,10 +32,10 @@ class TestRound:
         "hits_soft_17_not_bool",
         ["True", None, 1.0, 1]
     )
-    def test_raises_valueerror_when_hits_soft_17_not_instance_of_bool(self, hits_soft_17_not_bool):
+    def test_raises_type_error_when_hits_soft_17_not_instance_of_bool(self, hits_soft_17_not_bool):
         deck = FixedDeck()
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             BlackJackRound(deck, hits_soft_17=hits_soft_17_not_bool)
             
     

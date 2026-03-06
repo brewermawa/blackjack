@@ -137,9 +137,9 @@ Represents a single complete round of Blackjack, from the initial deal until a t
 
 ## Scope
 
-- Deals only with the current round. Does not care about bet size or how many cards are in the shoe (the calling class BlackJackSimulator is in charge of the shoe/deck).
+- Deals only with the current round. Does not care about bet size or how many cards are in the shoe (the calling class is in charge of the shoe/deck and bets).
 
-- BlackJackRound is responsible for resolving all hands derived from a single initial player hand, including splits.
+- BlackJackRound is responsible for resolving all hands derived from a single initial player hand, including splits (only 1 split allowed in this version).
 
 - Returns the result to the calling function/method
 
@@ -147,9 +147,9 @@ Represents a single complete round of Blackjack, from the initial deal until a t
 
 
 ## Inputs
-- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises ValueError. The deck should not contain jokers, if it does, raises ValueError.
+- deck: receives the working deck. Validates the deck received is an instance of Deck, otherwise it raises TypeError. The deck should not contain jokers, if it does, raises ValueError.
 
-- hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises ValueError if hits_soft_17 is not bool.
+- hits_soft_17: a flag that indicates if the dealer should hit or stand on a soft 17. Raises TypeError if hits_soft_17 is not bool.
 
 ## Attributes
 - player_hand: an instance of Hand class. Contains the player cards. When the BlackJackRound class is initialized, player_hand is created but no cards are added

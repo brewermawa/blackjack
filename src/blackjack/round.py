@@ -14,13 +14,12 @@ class BlackJackRound:
             raise ValueError("deck cannot contain jokers")
         
         if not isinstance(hits_soft_17, bool):
-            raise ValueError("hits_soft_17 must be instance of bool")
+            raise TypeError("hits_soft_17 must be instance of bool")
         
         self.deck = deck
         self.hits_soft_17 = hits_soft_17
         self.player_hands = [{"hand": Hand(), "doubled": False}]
         self.dealer_hand = Hand()
-        self._player_doubled = []
         self._player_split = False
 
 
