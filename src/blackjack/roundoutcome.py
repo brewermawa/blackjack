@@ -8,4 +8,4 @@ class RoundOutcome(Enum):
     LOSS = "loss" 
     DOUBLE_WIN = "double win"
     DOUBLE_LOSS = "double loss"
-    HALF_PAY = "surrender"
+    HALF_PAY = "half pay"
