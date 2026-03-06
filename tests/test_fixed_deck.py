@@ -1,6 +1,6 @@
 import pytest
 
-from fixed_deck import FixedDeck
+from blackjack.fixed_deck import FixedDeck
 
 #["♣", "♦", "♠", "♥"]
 class TestFixedDeck:

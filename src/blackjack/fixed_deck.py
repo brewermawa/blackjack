@@ -5,9 +5,6 @@ from cards.card import Card
 class FixedDeck(Deck):
     _TEST_SUIT = "♦"  # suit fija para armar secuencias deterministas en tests
 
-    def __init__(self, number_of_decks = 1, jokers = False):
-        super().__init__(number_of_decks, jokers)
-    
     def shuffle(self):
         super()._build_deck()
 

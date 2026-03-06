@@ -1,9 +1,9 @@
 import pytest
 
-from round import BlackJackRound
-from roundoutcome import RoundOutcome
 from cards.deck import Deck
-from fixed_deck import FixedDeck
+from blackjack.round import BlackJackRound
+from blackjack.roundoutcome import RoundOutcome
+from blackjack.fixed_deck import FixedDeck
 
 class TestRound:
     

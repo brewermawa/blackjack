@@ -492,3 +492,13 @@ All player hands are compared against the same final dealer hand.
 7) Outcome Ordering
 play() returns a list of outcomes whose length equals the final number of player hands.
 Outcomes are returned in the same order as the corresponding player hands were created.
+
+# Fixed Deck
+FixedDeck is a helper class used only for testing purposes.
+
+Its goal is to return a deck with the first N cards fixed, for example:
+
+def deck_for_bj(self):
+    self._program_ranks_top(["A", "8", "K", "J"])
+
+Where the "A" and "K" will be dealt to the player and "8" and "J" to the dealer
