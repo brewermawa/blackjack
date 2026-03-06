@@ -88,15 +88,6 @@ class BlackJackStrategy:
         # 10,10: S S S S S S S S S S
         "10": {"2": S, "3": S, "4": S, "5": S, "6": S, "7": S, "8": S, "9": S, "10": S, "A": S},
 
-        # J,J: S S S S S S S S S S
-        "J": {"2": S, "3": S, "4": S, "5": S, "6": S, "7": S, "8": S, "9": S, "10": S, "A": S},
-
-        # Q,Q: S S S S S S S S S S
-        "Q": {"2": S, "3": S, "4": S, "5": S, "6": S, "7": S, "8": S, "9": S, "10": S, "A": S},
-
-        # K,K: S S S S S S S S S S
-        "K": {"2": S, "3": S, "4": S, "5": S, "6": S, "7": S, "8": S, "9": S, "10": S, "A": S},
-
         # 9,9: P P P P P S P P S S
         "9":  {"2": P, "3": P, "4": P, "5": P, "6": P, "7": S, "8": P, "9": P, "10": S, "A": S},
 
@@ -126,10 +117,10 @@ class BlackJackStrategy:
     @classmethod
     def strategy(cls, player_hand: Hand, dealer_card: Card) -> Action:
         if not isinstance(player_hand, Hand):
-            raise ValueError("player hand must be instance of Hand")
+            raise TypeError("player hand must be instance of Hand")
         
         if not isinstance(dealer_card, Card):
-            raise ValueError("dealer card must be instance of Card")
+            raise TypeError("dealer card must be instance of Card")
         
         if len(player_hand) < 2:
             raise ValueError("player hand must have at least 2 cards")
@@ -139,7 +130,8 @@ class BlackJackStrategy:
        
         #Pairs
         if len(player_hand) == 2 and BlackJackEval.can_split(player_hand):
-            correct_move = cls.PAIR_STRATEGY[player_hand.cards[0].rank][dealer_card_rank]
+            player_pair_card_rank = "10" if player_hand.cards[0].rank in ["J", "Q", "K"] else player_hand.cards[0].rank
+            correct_move = cls.PAIR_STRATEGY[player_pair_card_rank][dealer_card_rank]
 
             return correct_move
         

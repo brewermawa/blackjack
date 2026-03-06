@@ -90,6 +90,9 @@ R = Surrender
 
 Decision priority follows standard blackjack rules: pairs first, then soft totals, then hard totals.
 
+### Variations
+When the player hand has more that 2 cards and the strategy table indicates double or surrender return hit instead.
+
 
 
 # RoundOutcome

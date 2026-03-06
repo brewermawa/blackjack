@@ -21,7 +21,6 @@ class TestBlackJackStrategy:
     hand_52 = Hand(); hand_52.add_card(Card("5","♣")); hand_52.add_card(Card("2","♦"))
     hand_62 = Hand(); hand_62.add_card(Card("6","♣")); hand_62.add_card(Card("2","♦"))
     hand_53 = Hand(); hand_53.add_card(Card("5","♣")); hand_53.add_card(Card("3","♦"))
-    hand_44 = Hand(); hand_44.add_card(Card("4","♣")); hand_44.add_card(Card("4","♦"))
 
     # 9
     hand_63 = Hand(); hand_63.add_card(Card("6","♣")); hand_63.add_card(Card("3","♦"))
@@ -37,7 +36,6 @@ class TestBlackJackStrategy:
 
     # 13–14
     hand_85 = Hand(); hand_85.add_card(Card("8","♣")); hand_85.add_card(Card("5","♦"))
-    hand_96 = Hand(); hand_96.add_card(Card("9","♣")); hand_96.add_card(Card("6","♦"))
 
     # 15
     hand_96 = Hand(); hand_96.add_card(Card("9","♣")); hand_96.add_card(Card("6","♦"))
@@ -47,7 +45,6 @@ class TestBlackJackStrategy:
 
     # 17+
     hand_98 = Hand(); hand_98.add_card(Card("9","♣")); hand_98.add_card(Card("8","♦"))
-    hand_99 = Hand(); hand_99.add_card(Card("9","♣")); hand_99.add_card(Card("9","♦"))
 
     hand_A2 = Hand(); hand_A2.add_card(Card("A","♣")); hand_A2.add_card(Card("2","♦"))
     hand_A3 = Hand(); hand_A3.add_card(Card("A","♣")); hand_A3.add_card(Card("3","♦"))
@@ -80,6 +77,11 @@ class TestBlackJackStrategy:
     hand_T27.add_card(Card("2","♦"))
     hand_T27.add_card(Card("7","♦"))
 
+    hand_T24 = Hand()
+    hand_T24.add_card(Card("J","♣"))
+    hand_T24.add_card(Card("2","♦"))
+    hand_T24.add_card(Card("4","♦"))
+
     # soft hands with 3 or more cards
     hand_A62 = Hand()
     hand_A62.add_card(Card("A","♣"))
@@ -106,11 +108,6 @@ class TestBlackJackStrategy:
     hand_A6T.add_card(Card("A","♣"))
     hand_A6T.add_card(Card("6","♦"))
     hand_A6T.add_card(Card("J","♣"))
-
-    hand_T24 = Hand()
-    hand_T24.add_card(Card("J","♣"))
-    hand_T24.add_card(Card("2","♦"))
-    hand_T24.add_card(Card("4","♣"))
 
     hand_A32 = Hand()
     hand_A32.add_card(Card("A","♣"))
@@ -143,8 +140,8 @@ class TestBlackJackStrategy:
             None,
         ], 
     )
-    def test_strategy_raises_valueerror_if_player_hand_is_not_instance_of_hand(self, invalid_hand):
-        with pytest.raises(ValueError):
+    def test_strategy_raises_typeerror_if_player_hand_is_not_instance_of_hand(self, invalid_hand):
+        with pytest.raises(TypeError):
             BlackJackStrategy.strategy(invalid_hand, Card("A", "♣"))
 
     @pytest.mark.parametrize(
@@ -157,8 +154,8 @@ class TestBlackJackStrategy:
             None,
         ]
     )
-    def test_strategy_raises_valueerror_if_dealer_card_is_not_instance_of_card(self, not_card):
-        with pytest.raises(ValueError):
+    def test_strategy_raises_typeerror_if_dealer_card_is_not_instance_of_card(self, not_card):
+        with pytest.raises(TypeError):
             BlackJackStrategy.strategy(self.valid_hand, not_card)
 
     @pytest.mark.parametrize(
@@ -225,7 +222,11 @@ class TestBlackJackStrategy:
             #hand_234: 9 against a 6 should be DOUBLE, but because we have 3 cards,
             #and doubles are permitted only on two cards, should return HIT.
             (hand_234, dealer_6, BlackJackStrategy.Action.HIT),
-            (hand_T27, dealer_6, BlackJackStrategy.Action.STAND)
+            (hand_T27, dealer_6, BlackJackStrategy.Action.STAND),
+
+            #hand_T24: 16 against a 10 should be SURRENDER, but because we have 3 cards,
+            #and SURRENDER is only on two cards, should return HIT.
+            (hand_T24, dealer_10, BlackJackStrategy.Action.HIT)
         ]
     )
     def test_strategy_returns_correct_action_with_hard_hands(self, player_hand, dealer_card, expected):
