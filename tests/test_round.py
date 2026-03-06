@@ -17,7 +17,7 @@ class TestRound:
         ]
     )
     def test_raises_valueerror_if_deck_is_not_instance_of_deck(self, deck):
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             BlackJackRound(deck, hits_soft_17=True)
 
     

@@ -8,7 +8,7 @@ from blackjack.strategy import BlackJackStrategy
 class BlackJackRound:
     def __init__(self, deck: Deck, hits_soft_17: bool) -> None:
         if not isinstance(deck, Deck):
-            raise ValueError("deck must be an instance of Deck")
+            raise TypeError("deck must be an instance of Deck")
         
         if deck.jokers:
             raise ValueError("deck cannot contain jokers")

@@ -203,7 +203,7 @@ class FixedDeck(Deck):
         dealer_hand: , 10, J
         player_hand[0]: 3, 2, Q
         """
-        self._program_ranks_top(["3", "10", "2", "J", "9"])
+        self._program_ranks_top(["3", "10", "2", "J", "Q"])
 
 
     def deck_for_soft_21(self):
