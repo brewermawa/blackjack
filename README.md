@@ -28,19 +28,13 @@ The first 3 methods are helper methods to be used inside the class
 
 # BlackJackStrategy
 
-The purpose of the BlackJackStrategy class is very simple: it receives the player hand and the dealers up card and returns the correct action (stand, hit, double, split, surrender).
+The purpose of the BlackJackStrategy class is very simple: it receives the player hand and the dealer up card and returns the correct action (stand, hit, double, split, surrender).
 
 It does nothing else: does not manipulate hands, calculate payouts, make a decision, etc.
 
 It is meant to be used by other code, for example the blackjack simulator
 
 No instances of BlackJackStrategy can be created (no __init__ method). The class will only expose class methods.
-
-For v1.0 only one set of rules will be used:
-- Dealer hits on soft 17
-- Surrender
-- Doble after split allowed
-- Double with any two cards
 
 The action returned is of type Action that is an Enum declared inside BlackJackStrategy:
 class Action(Enum):

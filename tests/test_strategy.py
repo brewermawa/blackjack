@@ -1,12 +1,9 @@
 import pytest
 
-from fixed_deck import FixedDeck
+
 from cards.hand import Hand
-from roundoutcome import RoundOutcome
-from strategy import BlackJackStrategy
 from cards.card import Card
-from cards.hand import Hand
-from round import BlackJackRound
+from blackjack.strategy import BlackJackStrategy
 
 class TestBlackJackStrategy:
     #"♣", "♦", "♠", "♥"
