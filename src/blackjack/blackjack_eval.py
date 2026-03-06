@@ -10,10 +10,12 @@ class BlackJackEval:
     - bust(cls, hand: Hand) -> bool
     """
 
+    RANKS_10 = {"10", "J", "Q", "K"}
+
     @classmethod
     def _validate_is_hand(cls, hand: Hand) -> None:
         if not isinstance(hand, Hand):
-            raise ValueError("hand must be an instance of the Hand class")
+            raise TypeError("hand must be an instance of the Hand class")
     
     @classmethod
     def _validate_two_cards(cls, hand: Hand) -> None:
@@ -32,7 +34,7 @@ class BlackJackEval:
         
         #Check for blackjack
         ace_in_hand = any(card.rank == "A" for card in hand.cards)
-        ten_in_hand = any(card.rank in ["10", "J", "Q", "K"] for card in hand.cards)
+        ten_in_hand = any(card.rank in cls.RANKS_10 for card in hand.cards)
 
         return ace_in_hand and ten_in_hand
 
@@ -71,7 +73,7 @@ class BlackJackEval:
         if hand.cards[0].rank == hand.cards[1].rank:
             return True
         
-        if hand.cards[0].rank in ["10", "J", "Q", "K"] and hand.cards[1].rank in ["10", "J", "Q", "K"]:
+        if hand.cards[0].rank in cls.RANKS_10 and hand.cards[1].rank in cls.RANKS_10:
             return True
         
         return False
@@ -93,7 +95,7 @@ class BlackJackEval:
         # If the sum of the ranks is over 21 hand is not soft
         # If the sum of the ranks is less than or equal to 21, hand is soft
 
-        ranks_JQK_as_10 = ["10" if card.rank in ["J", "Q", "K"] else card.rank for card in hand.cards]
+        ranks_JQK_as_10 = ["10" if card.rank in cls.RANKS_10 else card.rank for card in hand.cards]
         ranks_sum = sum([1 if rank == "A" else int(rank) for rank in ranks_JQK_as_10])
         
         return ranks_sum + 10 <= 21
@@ -105,7 +107,7 @@ class BlackJackEval:
         cls._validate_two_or_more_cards(hand)
         
         #Replace J, Q and K with 10
-        ranks_JQK_as_10 = ["10" if card.rank in ["J", "Q", "K"] else card.rank for card in hand.cards]
+        ranks_JQK_as_10 = ["10" if card.rank in cls.RANKS_10 else card.rank for card in hand.cards]
         ace_in_hand = any(rank == "A" for rank in ranks_JQK_as_10)
 
         if not ace_in_hand:
@@ -124,7 +126,4 @@ class BlackJackEval:
 
     @classmethod
     def bust(cls, hand: Hand) -> bool:
-        cls._validate_is_hand(hand)
-        cls._validate_two_or_more_cards(hand)
-
         return cls.value(hand) > 21

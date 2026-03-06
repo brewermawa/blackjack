@@ -1,9 +1,9 @@
-from fixed_deck import FixedDeck
 from cards.deck import Deck
 from cards.hand import Hand
-from blackjack_eval import BlackJackEval
-from roundoutcome import RoundOutcome
-from strategy import BlackJackStrategy
+from blackjack.fixed_deck import FixedDeck
+from blackjack.blackjack_eval import BlackJackEval
+from blackjack.roundoutcome import RoundOutcome
+from blackjack.strategy import BlackJackStrategy
 
 class BlackJackRound:
     def __init__(self, deck: Deck, hits_soft_17: bool) -> None:

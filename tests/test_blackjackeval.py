@@ -1,6 +1,6 @@
 import pytest
 
-from blackjack_eval import BlackJackEval
+from blackjack.blackjack_eval import BlackJackEval
 from cards.card import Card
 from cards.hand import Hand
 
@@ -51,8 +51,8 @@ class TestBlackjackEvalTypeValidation:
             "bool",
         ]
     )
-    def test_all_methods_raise_value_error_if_hand_not_hand_instance(self, method_to_test, invalid_hand):
-        with pytest.raises(ValueError):
+    def test_all_methods_raise_type_error_if_hand_not_hand_instance(self, method_to_test, invalid_hand):
+        with pytest.raises(TypeError):
             method_to_test(invalid_hand)
 
 
@@ -153,12 +153,6 @@ class TestBlackjackEval:
     hand_bust_AA46J.add_card(Card("4", "♥"))
     hand_bust_AA46J.add_card(Card("6", "♥"))
     hand_bust_AA46J.add_card(Card("J", "♥"))
-
-    # soft
-    hand_A62 = Hand()
-    hand_A62.add_card(Card("A","♣"))
-    hand_A62.add_card(Card("6","♦"))
-    hand_A62.add_card(Card("2","♦"))
 
     # soft
     hand_A222 = Hand()

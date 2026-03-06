@@ -2,7 +2,7 @@ from enum import Enum
 
 from cards.card import Card
 from cards.hand import Hand
-from blackjack_eval import BlackJackEval
+from blackjack.blackjack_eval import BlackJackEval
 
 class BlackJackStrategy:
     class Action(Enum):
